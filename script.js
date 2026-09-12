@@ -1,604 +1,215 @@
-@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Mono:wght@400;700&display=swap');
-:root {
-  --lime: #baff00;
-  --orange: #ff7417;
-  --black: #050505;
-  --white: #f7f7f0;
-}
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-html {
-  scroll-behavior: smooth;
-}
-body {
-  background: var(--lime);
-  color: var(--black);
-  font-family: "Space Mono", monospace;
-  overflow-x: hidden;
-}
-button {
-  font: inherit;
-}
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
-}
-/* =========================
-   LOADER
-========================= */
-.loader {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: var(--black);
-  color: var(--lime);
-  display: grid;
-  place-items: center;
-  transition: opacity .7s ease, visibility .7s ease;
-}
-.loader.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
-.loader-inner {
-  width: min(360px, 80vw);
-}
-.loader-rico {
-  font-family: "Archivo Black", sans-serif;
-  font-size: clamp(3rem, 15vw, 7rem);
-  letter-spacing: -0.08em;
-  line-height: .8;
-  margin-bottom: 30px;
-}
-.loader-bar {
-  width: 100%;
-  height: 10px;
-  border: 3px solid var(--lime);
-  overflow: hidden;
-}
-.loader-bar span {
-  display: block;
-  width: 0;
-  height: 100%;
-  background: var(--lime);
-  animation: load 1.8s cubic-bezier(.7,0,.2,1) forwards;
-}
-.loader p {
-  margin-top: 12px;
-  font-size: 10px;
-  letter-spacing: .12em;
-}
-@keyframes load {
-  to {
-    width: 100%;
+/* =========================================
+   RICO — POND EXPERIENCE
+========================================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const loader = document.getElementById("loader");
+  const enterBtn = document.getElementById("enterBtn");
+  const backBtn = document.getElementById("backBtn");
+  const pondScreen = document.getElementById("pondScreen");
+  const hero = document.querySelector(".hero");
+  const rico = document.querySelector(".rico-character");
+  /* =========================================
+     LOADER
+  ========================================= */
+  window.addEventListener("load", () => {
+    setTimeout(() => {
+      loader.classList.add("hidden");
+    }, 1900);
+  });
+  /* =========================================
+     ENTER THE POND
+  ========================================= */
+  enterBtn.addEventListener("click", () => {
+    // Button feedback
+    enterBtn.classList.add("clicked");
+    // Little screen shake
+    document.body.classList.add("screen-shake");
+    setTimeout(() => {
+      document.body.classList.remove("screen-shake");
+    }, 450);
+    // Scroll to the pond
+    setTimeout(() => {
+      pondScreen.scrollIntoView({
+        behavior: "smooth"
+      });
+    }, 250);
+  });
+  /* =========================================
+     BACK TO RICO
+  ========================================= */
+  backBtn.addEventListener("click", () => {
+    hero.scrollIntoView({
+      behavior: "smooth"
+    });
+  });
+  /* =========================================
+     RICO MOUSE MOVEMENT
+  ========================================= */
+  if (window.matchMedia("(pointer:fine)").matches) {
+    document.addEventListener("mousemove", (event) => {
+      const x = (event.clientX / window.innerWidth - 0.5);
+      const y = (event.clientY / window.innerHeight - 0.5);
+      if (rico) {
+        rico.style.transform = `
+          translate(${x * 18}px, ${y * 18}px)
+          rotate(${x * 3}deg)
+        `;
+      }
+    });
   }
-}
-/* =========================
-   MAIN HERO
-========================= */
-.hero {
-  position: relative;
-  min-height: 100svh;
-  overflow: hidden;
-  border-bottom: 5px solid var(--black);
-}
-.topbar {
-  position: relative;
-  z-index: 10;
-  width: 100%;
-  padding: 25px 4vw;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 4px solid var(--black);
-}
-.brand {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-family: "Archivo Black", sans-serif;
-  font-size: 24px;
-  letter-spacing: -.06em;
-}
-.brand-dot {
-  width: 15px;
-  height: 15px;
-  background: var(--orange);
-  border: 3px solid var(--black);
-  border-radius: 50%;
-}
-.status {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  font-size: 11px;
-  font-weight: 700;
-}
-.status-dot {
-  width: 10px;
-  height: 10px;
-  background: var(--orange);
-  border: 2px solid var(--black);
-  border-radius: 50%;
-  animation: blink 1s infinite;
-}
-@keyframes blink {
-  50% {
-    opacity: .25;
+  /* =========================================
+     RICO TAP EFFECT
+  ========================================= */
+  if (rico) {
+    rico.addEventListener("click", () => {
+      rico.classList.remove("rico-hit");
+      // Force animation restart
+      void rico.offsetWidth;
+      rico.classList.add("rico-hit");
+      createPopText();
+    });
   }
-}
-/* =========================
-   HERO CONTENT
-========================= */
-.hero-content {
-  position: relative;
-  z-index: 4;
-  min-height: calc(100svh - 80px);
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  align-items: center;
-  gap: 3vw;
-  padding: 5vw 7vw 9vw;
-}
-.hero-copy {
-  position: relative;
-  z-index: 6;
-}
-.eyebrow {
-  display: flex;
-  gap: 8px;
-  margin-bottom: 25px;
-}
-.eyebrow span {
-  padding: 8px 12px;
-  border: 3px solid var(--black);
-  background: var(--white);
-  font-size: 10px;
-  font-weight: 700;
-  transform: rotate(-2deg);
-}
-.eyebrow span:last-child {
-  background: var(--orange);
-  transform: rotate(2deg);
-}
-h1 {
-  max-width: 800px;
-  font-family: "Archivo Black", sans-serif;
-  font-size: clamp(4rem, 8.5vw, 9rem);
-  line-height: .78;
-  letter-spacing: -.085em;
-  text-transform: uppercase;
-}
-h1 span {
-  display: inline-block;
-  color: var(--orange);
-  -webkit-text-stroke: 4px var(--black);
-  transform: rotate(-3deg);
-  margin: 7px 0;
-}
-.hero-sub {
-  margin-top: 32px;
-  font-size: clamp(14px, 1.4vw, 18px);
-  line-height: 1.55;
-  font-weight: 700;
-}
-.enter-btn {
-  margin-top: 32px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 35px;
-  min-width: 250px;
-  padding: 18px 20px;
-  border: 4px solid var(--black);
-  background: var(--black);
-  color: var(--lime);
-  cursor: pointer;
-  font-family: "Archivo Black", sans-serif;
-  font-size: 14px;
-  letter-spacing: -.03em;
-  box-shadow: 8px 8px 0 var(--orange);
-  transition: transform .15s ease, box-shadow .15s ease;
-}
-.enter-btn:hover {
-  transform: translate(5px, 5px);
-  box-shadow: 3px 3px 0 var(--orange);
-}
-.enter-btn:active {
-  transform: translate(8px, 8px);
-  box-shadow: none;
-}
-.arrow {
-  font-size: 24px;
-}
-/* =========================
-   RICO STAGE
-========================= */
-.rico-stage {
-  position: relative;
-  width: min(48vw, 600px);
-  height: min(48vw, 600px);
-  min-width: 300px;
-  min-height: 300px;
-  margin: auto;
-  display: grid;
-  place-items: center;
-}
-.rico-character {
-  position: relative;
-  width: 70%;
-  aspect-ratio: 1;
-  z-index: 4;
-  animation: ricoFloat 3s ease-in-out infinite;
-}
-.rico-body {
-  position: absolute;
-  inset: 10%;
-  background: var(--orange);
-  border: 9px solid var(--black);
-  border-radius: 48% 52% 45% 55%;
-  transform: rotate(-4deg);
-  box-shadow: 18px 18px 0 var(--black);
-}
-.rico-eye {
-  position: absolute;
-  width: 13%;
-  aspect-ratio: 1;
-  top: 31%;
-  background: var(--black);
-  border-radius: 50%;
-}
-.eye-left {
-  left: 28%;
-}
-.eye-right {
-  right: 28%;
-}
-.rico-beak {
-  position: absolute;
-  width: 28%;
-  height: 17%;
-  left: 36%;
-  top: 45%;
-  background: var(--lime);
-  border: 7px solid var(--black);
-  clip-path: polygon(0 0, 100% 50%, 0 100%);
-}
-.rico-wing {
-  position: absolute;
-  width: 35%;
-  height: 23%;
-  top: 52%;
-  background: var(--orange);
-  border: 8px solid var(--black);
-  border-radius: 50%;
-}
-.wing-left {
-  left: -22%;
-  transform: rotate(18deg);
-}
-.wing-right {
-  right: -22%;
-  transform: rotate(-18deg);
-}
-.rico-shadow {
-  position: absolute;
-  width: 55%;
-  height: 8%;
-  bottom: 17%;
-  background: var(--black);
-  border-radius: 50%;
-  filter: blur(2px);
-  opacity: .18;
-}
-@keyframes ricoFloat {
-  0%,
-  100% {
-    transform: translateY(0) rotate(-1deg);
+  /* =========================================
+     RANDOM MEME POP TEXT
+  ========================================= */
+  const memeWords = [
+    "UP",
+    "RICO",
+    "W",
+    "SEND IT",
+    "NO BRAKES",
+    "MOON",
+    "COOKED",
+    "BULLISH",
+    "LOL",
+    "WAGMI"
+  ];
+  function createPopText() {
+    const text = document.createElement("div");
+    text.className = "pop-text";
+    text.textContent =
+      memeWords[Math.floor(Math.random() * memeWords.length)];
+    text.style.left =
+      `${35 + Math.random() * 30}%`;
+    text.style.top =
+      `${35 + Math.random() * 25}%`;
+    document.body.appendChild(text);
+    setTimeout(() => {
+      text.remove();
+    }, 900);
   }
-  50% {
-    transform: translateY(-18px) rotate(2deg);
+  /* =========================================
+     RANDOM FLOATING ARROWS
+  ========================================= */
+  function createArrow() {
+    const arrow = document.createElement("div");
+    arrow.className = "random-arrow";
+    arrow.textContent =
+      Math.random() > 0.5 ? "↗" : "↑";
+    arrow.style.left =
+      `${Math.random() * 100}%`;
+    arrow.style.bottom = "-50px";
+    arrow.style.animationDuration =
+      `${2.5 + Math.random() * 2}s`;
+    document.body.appendChild(arrow);
+    setTimeout(() => {
+      arrow.remove();
+    }, 5000);
   }
-}
-/* =========================
-   ORBITS
-========================= */
-.orbit {
-  position: absolute;
-  border: 4px solid var(--black);
-  border-radius: 50%;
-  pointer-events: none;
-}
-.orbit-one {
-  width: 95%;
-  height: 38%;
-  transform: rotate(-24deg);
-  animation: orbitSpin 7s linear infinite;
-}
-.orbit-two {
-  width: 105%;
-  height: 55%;
-  transform: rotate(52deg);
-  border-style: dashed;
-  animation: orbitSpinReverse 10s linear infinite;
-}
-@keyframes orbitSpin {
-  to {
-    transform: rotate(336deg);
+  /* =========================================
+     RANDOM ARROW LOOP
+  ========================================= */
+  setInterval(() => {
+    if (document.visibilityState === "visible") {
+      createArrow();
+    }
+  }, 1300);
+  /* =========================================
+     CARD TILT
+  ========================================= */
+  const cards = document.querySelectorAll(".pond-card");
+  cards.forEach(card => {
+    card.addEventListener("mousemove", (event) => {
+      if (!window.matchMedia("(pointer:fine)").matches) {
+        return;
+      }
+      const rect = card.getBoundingClientRect();
+      const x =
+        event.clientX - rect.left;
+      const y =
+        event.clientY - rect.top;
+      const rotateX =
+        ((y / rect.height) - 0.5) * -8;
+      const rotateY =
+        ((x / rect.width) - 0.5) * 8;
+      card.style.transform = `
+        perspective(600px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-8px)
+      `;
+    });
+    card.addEventListener("mouseleave", () => {
+      card.style.transform = "";
+    });
+  });
+  /* =========================================
+     SCROLL REVEAL
+  ========================================= */
+  const revealElements = [
+    ...document.querySelectorAll(".pond-card"),
+    document.querySelector(".pond-screen h2"),
+    document.querySelector(".pond-screen > .pond-inner > p")
+  ];
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add("revealed");
+          observer.unobserve(entry.target);
+        }
+      });
+    },
+    {
+      threshold: 0.15
+    }
+  );
+  revealElements.forEach(element => {
+    if (element) {
+      element.classList.add("reveal");
+      observer.observe(element);
+    }
+  });
+  /* =========================================
+     CONSOLE EASTER EGG
+  ========================================= */
+  console.log(
+    "%c RICO IS WATCHING. ",
+    "background:#baff00;color:#050505;font-size:18px;font-weight:bold;padding:10px;"
+  );
+  console.log(
+    "%c THE POND IS OPEN. ",
+    "background:#ff7417;color:#000;font-size:14px;font-weight:bold;padding:8px;"
+  );
+});
+/* =========================================
+   GLOBAL CLICK CHAOS
+========================================= */
+document.addEventListener("click", (event) => {
+  const target = event.target;
+  if (
+    target.tagName === "BUTTON" ||
+    target.closest("button") ||
+    target.closest(".rico-character")
+  ) {
+    return;
   }
-}
-@keyframes orbitSpinReverse {
-  to {
-    transform: rotate(-308deg);
-  }
-}
-.rico-label {
-  position: absolute;
-  right: 3%;
-  bottom: 9%;
-  z-index: 8;
-  display: flex;
-  flex-direction: column;
-  padding: 9px 12px;
-  background: var(--black);
-  color: var(--lime);
-  border: 3px solid var(--black);
-  transform: rotate(4deg);
-}
-.rico-label span {
-  font-family: "Archivo Black", sans-serif;
-  font-size: 13px;
-}
-.rico-label small {
-  font-size: 8px;
-}
-/* =========================
-   FLOATING ELEMENTS
-========================= */
-.float-element {
-  position: absolute;
-  z-index: 2;
-  font-family: "Archivo Black", sans-serif;
-  pointer-events: none;
-}
-.float-1 {
-  top: 18%;
-  right: 4%;
-  font-size: clamp(2rem, 6vw, 6rem);
-  transform: rotate(10deg);
-}
-.float-2 {
-  top: 34%;
-  left: 3%;
-  font-size: 40px;
-  animation: rocket 3s ease-in-out infinite;
-}
-.float-3 {
-  bottom: 18%;
-  left: 3%;
-  padding: 10px;
-  border: 4px solid var(--black);
-  background: var(--orange);
-  transform: rotate(-8deg);
-}
-.float-4 {
-  bottom: 28%;
-  right: 5%;
-  font-size: 90px;
-  animation: arrowUp 1.4s ease-in-out infinite;
-}
-.float-5 {
-  top: 14%;
-  left: 43%;
-  font-size: 35px;
-  transform: rotate(-14deg);
-}
-@keyframes rocket {
-  50% {
-    transform: translate(12px, -20px) rotate(10deg);
-  }
-}
-@keyframes arrowUp {
-  50% {
-    transform: translateY(-15px) rotate(5deg);
-  }
-}
-/* =========================
-   TICKER
-========================= */
-.ticker {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  overflow: hidden;
-  background: var(--black);
-  color: var(--lime);
-  border-top: 4px solid var(--black);
-  padding: 14px 0;
-  z-index: 10;
-}
-.ticker-track {
-  width: max-content;
-  display: flex;
-  gap: 40px;
-  animation: ticker 18s linear infinite;
-}
-.ticker span {
-  font-family: "Archivo Black", sans-serif;
-  font-size: 15px;
-  white-space: nowrap;
-}
-@keyframes ticker {
-  to {
-    transform: translateX(-50%);
-  }
-}
-/* =========================
-   POND SCREEN
-========================= */
-.pond-screen {
-  min-height: 100svh;
-  background: var(--black);
-  color: var(--lime);
-  padding: 12vw 7vw;
-  display: grid;
-  place-items: center;
-}
-.pond-inner {
-  width: min(1100px, 100%);
-}
-.section-tag {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  font-size: 11px;
-  font-weight: 700;
-  margin-bottom: 35px;
-}
-.section-tag span {
-  padding: 7px 9px;
-  color: var(--black);
-  background: var(--lime);
-}
-.pond-screen h2 {
-  font-family: "Archivo Black", sans-serif;
-  font-size: clamp(4rem, 9vw, 9rem);
-  line-height: .78;
-  letter-spacing: -.08em;
-}
-.pond-screen h2 span {
-  color: var(--orange);
-}
-.pond-screen > .pond-inner > p {
-  max-width: 450px;
-  margin-top: 35px;
-  color: var(--white);
-  line-height: 1.6;
-  font-size: 14px;
-}
-.pond-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 15px;
-  margin-top: 60px;
-}
-.pond-card {
-  min-height: 190px;
-  padding: 22px;
-  border: 3px solid var(--lime);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: .2s ease;
-}
-.pond-card:hover {
-  background: var(--lime);
-  color: var(--black);
-  transform: translateY(-8px) rotate(-1deg);
-}
-.card-number {
-  font-size: 11px;
-}
-.pond-card strong {
-  font-family: "Archivo Black", sans-serif;
-  font-size: 35px;
-}
-.pond-card small {
-  font-size: 9px;
-}
-.back-btn {
-  margin-top: 50px;
-  padding: 14px 18px;
-  border: 3px solid var(--lime);
-  background: transparent;
-  color: var(--lime);
-  cursor: pointer;
-  transition: .2s ease;
-}
-.back-btn:hover {
-  background: var(--lime);
-  color: var(--black);
-}
-/* =========================
-   NOISE
-========================= */
-.noise {
-  position: fixed;
-  inset: 0;
-  z-index: 9998;
-  pointer-events: none;
-  opacity: .035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
-}
-/* =========================
-   MOBILE
-========================= */
-@media (max-width: 800px) {
-  .topbar {
-    padding: 20px;
-  }
-  .brand {
-    font-size: 20px;
-  }
-  .hero-content {
-    grid-template-columns: 1fr;
-    min-height: auto;
-    padding: 60px 20px 100px;
-    gap: 45px;
-  }
-  h1 {
-    font-size: clamp(4rem, 18vw, 7rem);
-  }
-  h1 span {
-    -webkit-text-stroke: 3px var(--black);
-  }
-  .hero-sub {
-    font-size: 13px;
-  }
-  .enter-btn {
-    width: 100%;
-  }
-  .rico-stage {
-    width: min(90vw, 430px);
-    height: min(90vw, 430px);
-  }
-  .float-1 {
-    top: 11%;
-    right: -2%;
-  }
-  .float-4 {
-    right: 0;
-    bottom: 32%;
-    font-size: 55px;
-  }
-  .float-5 {
-    top: 48%;
-    left: 5%;
-  }
-  .pond-screen {
-    padding: 90px 20px;
-  }
-  .pond-grid {
-    grid-template-columns: 1fr;
-  }
-  .pond-card {
-    min-height: 150px;
-  }
-  .pond-screen h2 {
-    font-size: clamp(4rem, 19vw, 7rem);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: .01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-  }
-}
+  const dot = document.createElement("span");
+  dot.className = "click-dot";
+  dot.style.left = `${event.clientX}px`;
+  dot.style.top = `${event.clientY}px`;
+  document.body.appendChild(dot);
+  setTimeout(() => {
+    dot.remove();
+  }, 500);
+});
